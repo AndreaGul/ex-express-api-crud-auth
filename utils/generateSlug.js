@@ -13,6 +13,4 @@ const generateSlug= (name,posts)=>{
     }
     return slug
   }
-  module.exports ={
-    generateSlug,
-  }
+  module.exports = generateSlug;

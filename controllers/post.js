@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const { generateSlug } = require("../utils");
+const  generateSlug = require("../utils/generateSlug");
 const prisma = new PrismaClient();
 
 const store = async (req, res) => {
