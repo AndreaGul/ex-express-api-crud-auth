@@ -23,6 +23,9 @@ const registration = async (req,res)=>{
             name: user.name
         });
 
+        delete user.id;
+        delete user.password;
+
         res.json({token,data:user});
     }catch(err){
         errorHandler(err,req,res);
@@ -54,6 +57,9 @@ const login = async (req,res)=>{
             name: user.name
         })
 
+        delete user.id;
+        delete user.password;
+        
         res.json({token,data:user});
     }catch(err){
         errorHandler(err,req,res);
