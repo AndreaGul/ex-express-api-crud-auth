@@ -1,33 +1,48 @@
 const { PrismaClient } = require("@prisma/client");
 const  generateSlug = require("../utils/generateSlug");
 const prisma = new PrismaClient();
+const deletePic = require("../utils/deletePic");
+require("dotenv").config();
+const{PORT,HOST}=process.env;
+const port = PORT || 3000;
 
 const store = async (req, res) => {
-  const { title, content,img,categoryId,tags } = req.body;
+  const { title, content, categoryId, tags } = req.body;
 
   try {
     // Ottieni tutti i post per generare uno slug unico
     const posts = await prisma.post.findMany();
-    
     const slug = generateSlug(title, posts);
 
     const data = {
       title,
       content,
       slug,
-      img,
       published: req.body.published ? true : false,
-      tags:{
-        connect: tags.map(id=>({id})) //controlllare errore map
+      tags: {
+        connect: tags.map(id => ({ id: parseInt(id) }))
       }
     };
 
-    if(categoryId){
-      data.categoryId = categoryId;
+    if (categoryId) {
+      data.categoryId = parseInt(categoryId);
     }
-    // Creare un post
-    const post = await prisma.post.create({ data });
-    res.status(200).send(post);
+
+    if (req.file) {
+      data.img_path = `${HOST}:${port}/post_pics/${req.file.filename}`;
+    }
+
+    try {
+      // Creare un post
+      const post = await prisma.post.create({ data });
+      res.status(200).send(post);
+    } catch (err) {
+      if (req.file) {
+        deletePic('post_pics', req.file.filename);
+      }
+      errorHandler(err, req, res);
+    }
+
   } catch (err) {
     console.error(err);
     res.status(500).send('Errore del server');
@@ -82,6 +97,11 @@ const index = async (req, res) => {
       }
     const posts = await prisma.post.findMany({
         where,
+        orderBy:[
+          {
+            createAt: 'desc'
+          }
+        ],
         include: {
             category: {
             select: {
