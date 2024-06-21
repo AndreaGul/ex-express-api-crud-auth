@@ -27,9 +27,10 @@ const store = async (req, res) => {
     if (categoryId) {
       data.categoryId = parseInt(categoryId);
     }
-
-    if (req.file) {
-      data.img_path = `${HOST}:${port}/post_pics/${req.file.filename}`;
+ 
+      // Usa multer per gestire l'upload dell'immagine
+      if(req.file){
+        data.img= `${HOST}:${port}/post_pics/${req.file.filename}`;
     }
 
     try {

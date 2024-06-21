@@ -9,7 +9,7 @@ const authenticateToken = require('../middlewares/auth');
 
 // router.use(authenticateToken);
 
-router.post('/', [upload.single('image'),validator(bodyData)] , store);
+router.post('/', [upload.single('img'),validator(bodyData)] , store);
 
 router.get('/:slug', show);
 

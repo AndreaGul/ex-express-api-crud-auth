@@ -5,6 +5,7 @@ const path = require('path');
 const storage = multer.diskStorage({
     destination: "public/post_pics",
     filename: (req, file, cf) => {
+        
         const fileType = path.extname(file.originalname);
         cf(null, String(Date.now()) + fileType)
     }
