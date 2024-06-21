@@ -21,14 +21,6 @@ const bodyData ={
         in:["body"],
         optional:{
             options:{nullable:true},
-        },
-        isString: {
-            errorMessage: 'img deve essere una stringa.',
-            bail: true,
-        },
-        matches:{
-            options:[/\.(jpg|jpeg|png|gif)$/i],
-            errorMessage: 'img deve avere un \'estenzione valida(jpg, jpeg, png, gif)',
         }
     },
     content:{
@@ -81,20 +73,22 @@ const bodyData ={
             errorMessage:"i tag devono essere un array",
         },
         custom: {
-            options: async (idCercati)=>{
-                if(idCercati === 0){
-                    throw new Error (`Un post deve avere almeno un tag`);
+            options: async (idCercati) => {
+        
+                const notIntegerId = idCercati.find(id => isNaN(parseInt(id)));
+                if (notIntegerId) {
+                    throw new Error(`Uno o più ID non sono dei numeri interi.`);
                 }
-                const notIntegerId= idCercati.find(id=>isNaN(parseInt(id)));
-                if(notIntegerId){
-                    throw new Error (`Uno o più ID non sono dei numeri interi.`);
-                }
+        
                 const tags = await prisma.tag.findMany({
-                    where: { id: { in: idCercati } }
+                    //gli id vengono passati come stringa quindi bisogna ritrasformarli in numeri
+                    where: { id: { in: idCercati.map(id => parseInt(id)) } }
                 });
-                if(tags.length !== idCercati.length){
+        
+                if (tags.length !== idCercati.length) {
                     throw new Error(`Uno o più tag specificati non esistono`);
                 }
+        
                 return true;
             }
         }
